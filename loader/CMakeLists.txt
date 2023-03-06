@@ -306,7 +306,7 @@ if(WIN32)
     add_dependencies(vulkan loader_asm_gen_files)
 
 else()
-    if(APPLE AND BUILD_STATIC_LOADER)
+    if(BUILD_STATIC_LOADER)
         add_library(vulkan STATIC ${NORMAL_LOADER_SRCS} ${OPT_LOADER_SRCS})
         target_compile_definitions(vulkan PRIVATE BUILD_STATIC_LOADER)
     else()
