@@ -32,7 +32,7 @@ if (UNIX)
     option(LOADER_ENABLE_THREAD_SANITIZER "Linux & macOS only: Advanced thread checking" OFF)
 endif()
 
-if(APPLE)
+if(TRUE)
     option(BUILD_STATIC_LOADER "Build a loader that can be statically linked" OFF)
 endif()
 
@@ -227,6 +227,25 @@ if (HAVE___SECURE_GETENV)
 endif()
 if(NOT MSVC AND NOT (HAVE_SECURE_GETENV OR HAVE___SECURE_GETENV))
     message(WARNING "Using non-secure environmental lookups. This loader will not properly disable environent variables when run with elevated permissions.")
+endif()
+
+set(JINJA2_FOUND 0)
+
+if(PYTHONINTERP_FOUND)
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -c "import jinja2"
+        RESULT_VARIABLE EXIT_CODE
+        OUTPUT_QUIET
+    )
+    if (NOT EXIT_CODE)
+        set(JINJA2_FOUND 1)
+    endif()
+endif()
+
+if (PYTHONINTERP_FOUND AND JINJA2_FOUND)
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/scripts/generate_static_icds_header.py)
+else()
+    message(FATAL_ERROR "Python 3 with jinja2 is required to generate the static ICDs header file.")
 endif()
 
 # Optional codegen target
